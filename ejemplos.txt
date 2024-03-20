@@ -1,0 +1,60 @@
+var ent numero = 10;
+var flot decimal = 0.5;
+var bool bandera = falso;
+var cad saludo = "esto es una variable";
+var car letra = 'a';
+
+func test() {
+    imprimir("esto es una funcion");
+}
+
+Para(var ent i=0; i<3; i++){
+    imprimir("esto es un ciclo for"); 
+}
+
+si (num > decimal){
+    imprimir("esto es una sentencia if");
+}sino{
+    imprimir("esta es una sentencia else");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+reglas anteriores //ignorar
+-------------------------------------------
+var_decl | func_decl | for_decl | if_decl |
+
+    var_decl: VAR var_type IDENTIFIER value SEMICOLON
+
+    func_decl: FUNC IDENTIFIER PAREN PAREN BRACKET statement* BRACKET
+    statement: function_call SEMICOLON 
+    function_call: PRINT PAREN STRING PAREN 
+
+    for_decl: FOR PAREN var_decl condition SEMICOLON increment PAREN BRACKET statement* BRACKET
+    condition: IDENTIFIER OPERATOR value | IDENTIFIER OPERATOR IDENTIFIER
+    increment: IDENTIFIER PM
+
+    if_decl: IF PAREN condition PAREN BRACKET statement* BRACKET (ELSE BRACKET statement* BRACKET)?

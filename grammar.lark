@@ -1,0 +1,47 @@
+start: structures*
+
+structures: var_decl | func_decl | for_decl | if_decl
+
+var_decl: VAR type IDENTIFIER EQUAL value SEMICOLON
+
+func_decl: FUNC IDENTIFIER LPAREN RPAREN LBRACKET statement* RBRACKET
+    
+for_decl: FOR LPAREN var_decl condition SEMICOLON increment RPAREN LBRACKET statement* RBRACKET
+condition: IDENTIFIER OPERATOR value | IDENTIFIER OPERATOR IDENTIFIER
+increment: IDENTIFIER PM
+statement: PRINT LPAREN STRING RPAREN SEMICOLON | PRINT LPAREN IDENTIFIER RPAREN SEMICOLON
+
+if_decl: IF LPAREN condition RPAREN LBRACKET statement* RBRACKET (else_decl)?
+else_decl: ELSE LBRACKET statement* RBRACKET
+
+FUNC: "func"
+VAR: "var"
+FOR: "Para"
+PRINT: "imprimir"
+IF: "si"
+ELSE: "sino"
+type: "ent" | "flot" | "bool" | "cad" | "car"
+SEMICOLON: ";"
+LBRACKET: "{"
+RBRACKET: "}"
+LPAREN: "("
+RPAREN: ")"
+OPERATOR: "<" | ">" | "<=" | ">=" | "!=" | "=="
+PM: "++" | "--" 
+EQUAL: "="
+value: INT         -> int
+    | FLOAT       -> float
+    | BOOLEAN     -> boolean
+    | STRING      -> string
+    | CHAR        -> char
+
+IDENTIFIER: /[a-z][a-z]*/
+INT: /\d+/
+FLOAT: /\d*\.\d+/
+BOOLEAN: "verdadero" | "falso"
+STRING: /"([^;()\[\]{}]|\\")*"/
+CHAR: /'([^']|\\')'/
+UNKNOWN: /./
+
+%import common.WS
+%ignore WS
