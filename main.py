@@ -1,17 +1,13 @@
-from interpreter import get_parser, Interpreter
+from lark import Lark
+from interpreter import Interpreter
 
-# Definir una función para ejecutar el script
+with open("grammar.lark", "r") as file:
+    grammar = file.read()
+
 def execute(script):
-    parser = get_parser()
-    tree = parser.parse(script)
     interpreter = Interpreter()
-    interpreter.transform(tree)
-    output = '\n'.join(interpreter.output)
-    return output
-
-# Testear el intérprete con un script básico
-script = """
-var cad x = "Hello, world!";
-imprimir(x);
-"""
-
+    parser = Lark(grammar, start='start', parser='lalr', transformer=interpreter)
+    parser.parse(script)
+    return interpreter.variables
+    #respuesta = '\n'.join(interpreter.output)
+    #return respuesta

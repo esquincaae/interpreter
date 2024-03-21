@@ -1,6 +1,6 @@
 start: structures*
 
-structures: var_decl | func_decl | for_decl | if_decl
+structures: var_decl | func_decl | for_decl | if_decl | statement
 
 var_decl: VAR type IDENTIFIER EQUAL value SEMICOLON
 
