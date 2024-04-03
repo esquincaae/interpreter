@@ -1,16 +1,27 @@
 import tkinter as tk
 from tkinter import messagebox
 from main import execute 
+import sys
+from io import StringIO
 
 def procesar():
     entrada = text_area_entrada.get('1.0', tk.END)
     try:
-        script = execute(entrada)
+        interpreter = execute(entrada)
+        codigo_python = interpreter.output
+
+        # Redireccionar stdout para capturar la salida
+        old_stdout = sys.stdout
+        redirected_output = sys.stdout = StringIO()
+        exec(codigo_python)  # Ejecutar el código Python generado
+        sys.stdout = old_stdout  # Restaurar stdout
+
         text_area_resultado.delete('1.0', tk.END)
-        text_area_resultado.insert(tk.END, script)
-        messagebox.showinfo("Éxito", "Entrada válida.")
+        text_area_resultado.insert(tk.END, redirected_output.getvalue())
+        messagebox.showinfo("Éxito", "Script procesado y ejecutado.")
     except Exception as e:
-        messagebox.showerror("Error de ejecucion", str(e))
+        messagebox.showerror("Error de ejecución", str(e))
+
 
 root = tk.Tk()
 root.title("Lyra: Analizador semantico")
