@@ -1,12 +1,11 @@
 from lark import Lark
 from interpreter import Interpreter
-from transformador import MyTransformer
+from lexer import MyTransformer
 
 with open("grammar.lark", "r") as file:
     grammar = file.read()
 
 def execute_python(script):
-    print(script)
     interpreter = Interpreter()
     parser = Lark(grammar, start='start', parser='lalr', transformer=interpreter)
     parser.parse(script)

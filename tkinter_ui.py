@@ -21,8 +21,6 @@ def procesar():
         
         text_area_lexico.delete('1.0', tk.END)
         text_area_lexico.insert(tk.END, execute_lexico(entrada))
-        #text_area_sintactico.delete('1.0', tk.END)
-        #text_area_sintactico.insert()
 
         messagebox.showinfo("Éxito", "Script procesado y ejecutado.")
     except Exception as e:
@@ -47,10 +45,5 @@ label_python = tk.Label(root, text="Salida en Python")
 label_python.pack()
 text_area_python = tk.Text(root, height=10, width=100)
 text_area_python.pack(padx=10, pady=10)
-
-#label_sintactico = tk.Label(root, text="Salida Sintactica")
-#label_sintactico.pack()
-#text_area_sintactico = tk.Text(root, height=5, width=50)
-#text_area_sintactico.pack(padx=10, pady=10)
 
 root.mainloop()

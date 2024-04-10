@@ -7,12 +7,30 @@ class Interpreter(Transformer):
         self.variables = {}
 
     def var_decl(self, items):
-        print(items)
-        var_name, var_value = str(items[2]), items[4]
+        var_type, var_name, var_value = items[1], str(items[2]), items[4]
         if isinstance(var_value, Token):
             value = var_value.value
         elif isinstance(var_value, Tree):
             value = self.process_tree(var_value)
+
+        if isinstance(var_type, Token):
+            vtype = var_type.value
+        elif isinstance(var_type, Tree):
+            vtype = self.process_tree(var_type)
+
+        print(f"{vtype} : {value}")    
+
+        if vtype == 'ent' and not isinstance(int(value), int):
+            raise SyntaxError(f"Error de tipo: se esperaba un entero, se obtuvo {value}")
+        elif vtype == 'flot' and not isinstance(float(value), float):
+            raise SyntaxError(f"Error de tipo: se esperaba un flotante, se obtuvo {value}")
+        elif vtype == 'bool':
+            if value != 'True' and value != 'False':
+                raise SyntaxError(f"Error de tipo: se esperaba un booleano, se obtuvo {value}")
+        elif vtype == 'cad' and not (isinstance(value, str) and value.startswith('"') and value.endswith('"')):
+            raise SyntaxError(f"Error de tipo: se esperaba una cadena, se obtuvo {value}")
+        elif vtype == 'car' and not (isinstance(value, str) and len(value) == 3):
+            raise SyntaxError(f"Error de tipo: se esperaba un carácter, se obtuvo {value}")
 
         self.output += f'{var_name} = {value}\n'
 
