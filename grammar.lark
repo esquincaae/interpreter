@@ -2,7 +2,7 @@ start: structures*
 
 structures: var_decl | func_decl | for_decl | if_decl | statement
 
-var_decl: VAR type IDENTIFIER EQUAL value SEMICOLON
+var_decl: VAR TYPE IDENTIFIER EQUAL value SEMICOLON
 
 func_decl: FUNC IDENTIFIER LPAREN RPAREN LBRACKET statement* RBRACKET
     
@@ -20,7 +20,7 @@ FOR: "Para"
 PRINT: "imprimir"
 IF: "si"
 ELSE: "sino"
-type: "ent" | "flot" | "bool" | "cad" | "car"
+TYPE: "ent" | "flot" | "bool" | "cad" | "car"
 SEMICOLON: ";"
 LBRACKET: "{"
 RBRACKET: "}"
