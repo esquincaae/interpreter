@@ -4,15 +4,17 @@ class Interpreter(Transformer):
     def __init__(self):
         super().__init__()
         self.output = ""  # Código Python generado
+        self.variables = {}
 
     def var_decl(self, items):
         # Se asume que el nombre de la variable es siempre un Token y el valor puede ser un Token o un Tree
-        var_type, var_name, var_value = items[1], str(items[2]), items[4]
+        print(items)
+        var_name, var_value = str(items[2]), items[4]
         if isinstance(var_value, Token):
             value = var_value.value
         elif isinstance(var_value, Tree):
             value = self.process_tree(var_value)
-            
+
         self.output += f'{var_name} = {value}\n'
 
     def statement(self, items):
@@ -34,13 +36,17 @@ class Interpreter(Transformer):
         # Diferentes ramas para cada tipo de nodo basado en su etiqueta
         if tree.data == 'var_decl':
             # Procesamiento para declaraciones de variable
-            _, var_type, identifier, _, value, _ = tree.children
+            _, type_node, identifier, _, value, _ = tree.children
+            var_type = type_node.value
             var_name = identifier.value
             var_value = self.process_node(value)
             return f'{var_name} = {var_value}'
         elif tree.data == 'int':
             # Procesamiento para enteros
-            return tree.children[0].value
+            if tree.children[0].value.isdigit():
+                return tree.children[0].value
+            else:
+                raise Exception(f"el tipo no coincide con el valor:  {tree.data}:{tree.children[0].value}")
         elif tree.data == 'float':
             # Procesamiento para flotantes
             return tree.children[0].value
