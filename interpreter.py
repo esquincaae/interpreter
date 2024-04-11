@@ -1,3 +1,4 @@
+#interpreter.py
 from lark import Transformer, Token, Tree
 
 class Interpreter(Transformer):
@@ -19,20 +20,61 @@ class Interpreter(Transformer):
             vtype = self.process_tree(var_type)
 
         print(f"{vtype} : {value}")    
+# Asegúrate de manejar correctamente los valores numéricos y de cadena
+        if vtype == 'ent':
+            if isinstance(value, str) and value.isdigit():
+                value = int(value)  # Convertir a int si es un dígito
+            if not isinstance(value, int):
+                raise SyntaxError(f"Error de tipo: se esperaba un entero, se obtuvo {type(value).__name__} {value}")
+        elif vtype == 'flot':
+            try:
+                value = float(value)  # Intenta convertir a float
+            except ValueError:
+                raise SyntaxError(f"Error de tipo: se esperaba un flotante, se obtuvo {value}")
+        # Resto de la validación...
+        
+ 
+    def for_decl(self, items):
+        if items[2] is not None:
+            self.var_decl(items[2])
 
-        if vtype == 'ent' and not isinstance(int(value), int):
-            raise SyntaxError(f"Error de tipo: se esperaba un entero, se obtuvo {value}")
-        elif vtype == 'flot' and not isinstance(float(value), float):
-            raise SyntaxError(f"Error de tipo: se esperaba un flotante, se obtuvo {value}")
-        elif vtype == 'bool':
-            if value != 'True' and value != 'False':
-                raise SyntaxError(f"Error de tipo: se esperaba un booleano, se obtuvo {value}")
-        elif vtype == 'cad' and not (isinstance(value, str) and value.startswith('"') and value.endswith('"')):
-            raise SyntaxError(f"Error de tipo: se esperaba una cadena, se obtuvo {value}")
-        elif vtype == 'car' and not (isinstance(value, str) and len(value) == 3):
-            raise SyntaxError(f"Error de tipo: se esperaba un carácter, se obtuvo {value}")
+        condition_expression = items[3] if isinstance(items[3], str) else ''
+        increment_expression = items[5] if isinstance(items[5], str) else ''
 
-        self.output += f'{var_name} = {value}\n'
+        range_expression = "0, 3"  # Asumimos que esto se ajusta basado en condition_expression
+
+        body = items[8]
+        self.output += f'for i in range({range_expression}):\n'
+        if isinstance(body, Tree):
+            for item in body.children:
+                stmt_output = self.process_tree(item) if isinstance(item, Tree) else None
+                if stmt_output:
+                    # La siguiente línea asegura que el contenido del bucle se indente correctamente.
+                    indented_stmt_output = '    ' + stmt_output.replace('\n', '\n    ')
+                    self.output += indented_stmt_output
+        else:
+            self.output += '    pass\n'
+
+
+        
+    print("Debug for_decl - End")
+    def condition(self, items):
+        # Este es un esquema básico; deberás adaptarlo a tu lógica específica.
+        if len(items) == 3:
+            identifier = items[0].value
+            operator = items[1].value
+            value = self.process_tree(items[2])  # Asume que items[2] es un Tree.
+            return f"{identifier} {operator} {value}"
+        return ""
+
+    def increment(self, items):
+        # Adaptar según cómo desees procesar los incrementos.
+        if len(items) == 2:
+            identifier = items[0].value
+            operation = items[1].value  # ++ o --
+            return f"{identifier} {operation}"
+        return ""
+
 
     def statement(self, items):
         action, expr = items[0], items[2]

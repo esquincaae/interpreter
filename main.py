@@ -1,3 +1,4 @@
+#main.py
 from lark import Lark
 from interpreter import Interpreter
 from lexer import MyTransformer
