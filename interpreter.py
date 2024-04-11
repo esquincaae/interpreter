@@ -34,8 +34,6 @@ class Interpreter(Transformer):
             self.variables = {var_name:value}
             self.output += f'{var_name} = {value}\n'
         
-        
- 
     def for_decl(self, items):
         if items[2] is not None:
             self.var_decl(items[2])
@@ -47,22 +45,17 @@ class Interpreter(Transformer):
         range_expression = range_expression[:-1] if range_expression.endswith(';') else range_expression  # Eliminar el punto y coma si lo hay
 
         self.output += f'for i in range({range_expression}):\n'
-        print("Debug: Cuerpo del bucle:")
+        #print("Debug: Cuerpo del bucle:")
         if isinstance(items[8], Tree):
             for child in items[8].children:
                 self.process_tree(child)
         else:
-            print("No hay instrucciones dentro del bucle.")
+            #print("No hay instrucciones dentro del bucle.")
             self.output += '    pass\n'
-        print("Fin del bucle for")
+        #print("Fin del bucle for")
 
-
-
-
-        
-    print("Debug for_decl - End")
+    #print("Debug for_decl - End")
     def condition(self, items):
-        # Este es un esquema básico; deberás adaptarlo a tu lógica específica.
         if len(items) == 3:
             identifier = items[0].value
             operator = items[1].value
@@ -90,6 +83,43 @@ class Interpreter(Transformer):
             elif isinstance(expr, Tree):
                 expr_value = self.process_tree(expr)
                 self.output += f'print({expr_value})\n'
+
+    def if_decl(self, items):
+        condition = items[1]
+        true_block = items[3]
+
+        else_block = items[5] if len(items) > 4 else None
+        condition_result = self.evaluate_condition(condition)
+
+        if condition_result:
+            self.execute_block(true_block)
+        elif else_block:
+            self.execute_block(else_block.children[1])
+
+    def evaluate_condition(self, condition):
+        if isinstance(condition, Tree):
+            identifier, operator, value = condition.children
+            variable_value = self.variables.get(identifier.value)
+            if operator.value == "<":
+                return variable_value < value
+            elif operator.value == ">":
+                return variable_value > value
+            elif operator.value == "<=":
+                return variable_value <= value
+            elif operator.value == ">=":
+                return variable_value >= value
+            elif operator.value == "==":
+                return variable_value == value
+            elif operator.value == "!=":
+                return variable_value != value
+            else:
+                raise ValueError(f"Operador no reconocido: {operator.value}")
+        return False
+
+    def execute_block(self, block):
+        for stmt in block.children:
+            if stmt.data == "statement":
+                self.statement(stmt)
 
     def process_tree(self, tree):
         if tree.data == 'var_decl':
