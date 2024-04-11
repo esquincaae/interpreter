@@ -8,30 +8,32 @@ class Interpreter(Transformer):
         self.variables = {}
 
     def var_decl(self, items):
-        var_type, var_name, var_value = items[1], str(items[2]), items[4]
-        if isinstance(var_value, Token):
-            value = var_value.value
-        elif isinstance(var_value, Tree):
-            value = self.process_tree(var_value)
+            var_type, var_name, var_value = items[1], str(items[2]), items[4]
+            if isinstance(var_value, Token):
+                value = var_value.value
+            elif isinstance(var_value, Tree):
+                value = self.process_tree(var_value)
 
-        if isinstance(var_type, Token):
-            vtype = var_type.value
-        elif isinstance(var_type, Tree):
-            vtype = self.process_tree(var_type)
+            if isinstance(var_type, Token):
+                vtype = var_type.value
+            elif isinstance(var_type, Tree):
+                vtype = self.process_tree(var_type)
 
-        print(f"{vtype} : {value}")    
-# Asegúrate de manejar correctamente los valores numéricos y de cadena
-        if vtype == 'ent':
-            if isinstance(value, str) and value.isdigit():
-                value = int(value)  # Convertir a int si es un dígito
-            if not isinstance(value, int):
-                raise SyntaxError(f"Error de tipo: se esperaba un entero, se obtuvo {type(value).__name__} {value}")
-        elif vtype == 'flot':
-            try:
-                value = float(value)  # Intenta convertir a float
-            except ValueError:
+            if vtype == 'ent' and not isinstance(int(value), int):
+                raise SyntaxError(f"Error de tipo: se esperaba un entero, se obtuvo {value}")
+            elif vtype == 'flot' and not isinstance(float(value), float):
                 raise SyntaxError(f"Error de tipo: se esperaba un flotante, se obtuvo {value}")
-        # Resto de la validación...
+            elif vtype == 'bool':
+                if value != 'True' and value != 'False':
+                    raise SyntaxError(f"Error de tipo: se esperaba un booleano, se obtuvo {value}")
+            elif vtype == 'cad' and not (isinstance(value, str) and value.startswith('"') and value.endswith('"')):
+                raise SyntaxError(f"Error de tipo: se esperaba una cadena, se obtuvo {value}")
+            elif vtype == 'car' and not (isinstance(value, str) and len(value) == 3):
+                raise SyntaxError(f"Error de tipo: se esperaba un carácter, se obtuvo {value}")
+
+            self.variables = {var_name:value}
+            self.output += f'{var_name} = {value}\n'
+        
         
  
     def for_decl(self, items):
@@ -41,19 +43,20 @@ class Interpreter(Transformer):
         condition_expression = items[3] if isinstance(items[3], str) else ''
         increment_expression = items[5] if isinstance(items[5], str) else ''
 
-        range_expression = "0, 3"  # Asumimos que esto se ajusta basado en condition_expression
+        range_expression = condition_expression.split('<')[1].strip()  # Extraer la parte derecha de la condición
+        range_expression = range_expression[:-1] if range_expression.endswith(';') else range_expression  # Eliminar el punto y coma si lo hay
 
-        body = items[8]
         self.output += f'for i in range({range_expression}):\n'
-        if isinstance(body, Tree):
-            for item in body.children:
-                stmt_output = self.process_tree(item) if isinstance(item, Tree) else None
-                if stmt_output:
-                    # La siguiente línea asegura que el contenido del bucle se indente correctamente.
-                    indented_stmt_output = '    ' + stmt_output.replace('\n', '\n    ')
-                    self.output += indented_stmt_output
+        print("Debug: Cuerpo del bucle:")
+        if isinstance(items[8], Tree):
+            for child in items[8].children:
+                self.process_tree(child)
         else:
+            print("No hay instrucciones dentro del bucle.")
             self.output += '    pass\n'
+        print("Fin del bucle for")
+
+
 
 
         
